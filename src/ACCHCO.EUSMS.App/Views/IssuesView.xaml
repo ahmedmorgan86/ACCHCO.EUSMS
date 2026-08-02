@@ -1,0 +1,19 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.IssuesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="clr-namespace:ACCHCO.EUSMS.App.Views"
+             FlowDirection="RightToLeft">
+    <Grid>
+        <TabControl>
+            <TabItem Header="الحوادث">
+                <views:IncidentManagementView />
+            </TabItem>
+            <TabItem Header="المشاكل">
+                <views:ProblemManagementView />
+            </TabItem>
+            <TabItem Header="الأخطاء المعروفة">
+                <views:KnownErrorView />
+            </TabItem>
+        </TabControl>
+    </Grid>
+</UserControl>

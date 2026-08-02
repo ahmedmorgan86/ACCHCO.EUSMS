@@ -1,0 +1,228 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.IncidentManagementView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+             xmlns:data="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+             xmlns:enums="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+             FlowDirection="RightToLeft">
+
+    <UserControl.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:InverseBooleanToVisibilityConverter x:Key="InverseBoolToVis" />
+        <helpers:NullToBoolConverter x:Key="NullToBool" />
+        <helpers:NullToVisibilityConverter x:Key="NullToVis" />
+        <helpers:InverseNullToVisibilityConverter x:Key="InverseNullToVis" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,15">
+            <TextBlock Text="إدارة الحوادث" Style="{StaticResource PageTitleStyle}" DockPanel.Dock="Right" />
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" HorizontalAlignment="Left">
+                <Button Content="إلغاء" Command="{Binding CancelEditCommand}" Padding="12,8"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="إغلاق" Command="{Binding CloseCommand}" Padding="12,8"
+                        IsEnabled="{Binding SelectedIncident, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="إعادة فتح" Command="{Binding ReopenCommand}" Padding="12,8"
+                        IsEnabled="{Binding SelectedIncident, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="حل" Command="{Binding ResolveCommand}" Padding="12,8"
+                        IsEnabled="{Binding SelectedIncident, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="حفظ" Command="{Binding SaveCommand}"
+                        Style="{StaticResource ActionButtonStyle}" Padding="12,8"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="حذف" Command="{Binding DeleteCommand}"
+                        Background="#FFF44336" Foreground="White" Padding="12,8"
+                        IsEnabled="{Binding SelectedIncident, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="تعديل" Command="{Binding EditCommand}" Padding="12,8"
+                        IsEnabled="{Binding SelectedIncident, Converter={StaticResource NullToBool}}"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+                <Button Content="إضافة" Command="{Binding AddNewCommand}"
+                        Style="{StaticResource ActionButtonStyle}" Padding="12,8"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource InverseBoolToVis}}" Margin="0,0,8,0" />
+            </StackPanel>
+        </DockPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="12">
+            <WrapPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الخطورة" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="130" SelectedValue="{Binding FilterSeverity}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="منخفضة" Tag="{x:Static data:IncidentSeverity.Low}" />
+                        <ComboBoxItem Content="متوسطة" Tag="{x:Static data:IncidentSeverity.Medium}" />
+                        <ComboBoxItem Content="عالية" Tag="{x:Static data:IncidentSeverity.High}" />
+                        <ComboBoxItem Content="حرجة" Tag="{x:Static data:IncidentSeverity.Critical}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الحالة" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="130" SelectedValue="{Binding FilterStatus}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="جديد" Tag="{x:Static data:IncidentStatus.New}" />
+                        <ComboBoxItem Content="معين" Tag="{x:Static data:IncidentStatus.Assigned}" />
+                        <ComboBoxItem Content="قيد التنفيذ" Tag="{x:Static data:IncidentStatus.InProgress}" />
+                        <ComboBoxItem Content="تم الحل" Tag="{x:Static data:IncidentStatus.Resolved}" />
+                        <ComboBoxItem Content="مغلق" Tag="{x:Static data:IncidentStatus.Closed}" />
+                        <ComboBoxItem Content="معاد فتحه" Tag="{x:Static data:IncidentStatus.Reopened}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="البحث" FontSize="11" Foreground="#FF888888" />
+                    <TextBox Width="180" Text="{Binding FilterSearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Padding="6,4" FontSize="12" />
+                </StackPanel>
+                <Button Content="تصفية" Command="{Binding FilterCommand}" Style="{StaticResource ActionButtonStyle}"
+                        VerticalAlignment="Bottom" Margin="0,0,5,0" Padding="12,8" />
+            </WrapPanel>
+        </Border>
+
+        <DataGrid Grid.Row="2" ItemsSource="{Binding IncidentList}" Style="{StaticResource DataGridStyle}"
+                  SelectedItem="{Binding SelectedIncident}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="رقم الحادث" Binding="{Binding IncidentNumber}" Width="120" />
+                <DataGridTextColumn Header="اسم مقدم الطلب" Binding="{Binding RequesterName}" Width="140" />
+                <DataGridTextColumn Header="وصف المشكلة" Binding="{Binding ProblemDescription}" Width="*" />
+                <DataGridTextColumn Header="الخطورة" Binding="{Binding Severity}" Width="80" />
+                <DataGridTextColumn Header="الأولوية" Binding="{Binding Priority}" Width="80" />
+                <DataGridTextColumn Header="حالة سير العمل" Binding="{Binding WorkflowStatus}" Width="120" />
+                <DataGridTextColumn Header="تاريخ الحادث" Binding="{Binding IncidentDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="110" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="3" Style="{StaticResource CardStyle}"
+                Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}"
+                Padding="12" Margin="0,10,0,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="420">
+                <StackPanel>
+                    <TextBlock Text="بيانات الحادث" Style="{StaticResource SectionHeaderStyle}" />
+
+                    <WrapPanel>
+                        <StackPanel Margin="0,0,15,8" Width="200">
+                            <TextBlock Text="اسم مقدم الطلب" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.RequesterName, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="200">
+                            <TextBlock Text="قسم مقدم الطلب" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.RequesterSection, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="200">
+                            <TextBlock Text="التصنيف" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.Category, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="200">
+                            <TextBlock Text="الموقع" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.Location, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="200">
+                            <TextBlock Text="اسم الجهاز" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.ComputerName, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="150">
+                            <TextBlock Text="عنوان IP" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding EditIncident.IpAddress, UpdateSourceTrigger=PropertyChanged}" Padding="6,4" />
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="وصف المشكلة" FontSize="11" Foreground="#FF888888" />
+                        <TextBox Text="{Binding EditIncident.ProblemDescription, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="60" Padding="6,4" />
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="وصف التأثير" FontSize="11" Foreground="#FF888888" />
+                        <TextBox Text="{Binding EditIncident.ImpactDescription, UpdateSourceTrigger=PropertyChanged}"
+                                 AcceptsReturn="True" TextWrapping="Wrap" Height="50" Padding="6,4" />
+                    </StackPanel>
+
+                    <WrapPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="الخطورة" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Severity, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="منخفضة" Tag="{x:Static data:IncidentSeverity.Low}" />
+                                <ComboBoxItem Content="متوسطة" Tag="{x:Static data:IncidentSeverity.Medium}" />
+                                <ComboBoxItem Content="عالية" Tag="{x:Static data:IncidentSeverity.High}" />
+                                <ComboBoxItem Content="حرجة" Tag="{x:Static data:IncidentSeverity.Critical}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="التأثير" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Impact, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="مستخدم واحد" Tag="{x:Static data:IncidentImpact.SingleUser}" />
+                                <ComboBoxItem Content="قسم" Tag="{x:Static data:IncidentImpact.Department}" />
+                                <ComboBoxItem Content="عدة أقسام" Tag="{x:Static data:IncidentImpact.MultipleDepartments}" />
+                                <ComboBoxItem Content="المؤسسة بأكملها" Tag="{x:Static data:IncidentImpact.EntireOrganization}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="الإلحاح" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Urgency, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="منخفض" Tag="{x:Static data:IncidentUrgency.Low}" />
+                                <ComboBoxItem Content="متوسط" Tag="{x:Static data:IncidentUrgency.Medium}" />
+                                <ComboBoxItem Content="عالي" Tag="{x:Static data:IncidentUrgency.High}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="الأولوية" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Priority, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="منخفضة" Tag="{x:Static data:Priority.Low}" />
+                                <ComboBoxItem Content="متوسطة" Tag="{x:Static data:Priority.Medium}" />
+                                <ComboBoxItem Content="عالية" Tag="{x:Static data:Priority.High}" />
+                                <ComboBoxItem Content="حرجة" Tag="{x:Static data:Priority.Critical}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="المصدر" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Source, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="هاتف" Tag="{x:Static data:IncidentSource.Phone}" />
+                                <ComboBoxItem Content="بريد إلكتروني" Tag="{x:Static data:IncidentSource.Email}" />
+                                <ComboBoxItem Content="البوابة" Tag="{x:Static data:IncidentSource.Portal}" />
+                                <ComboBoxItem Content="حضور مباشر" Tag="{x:Static data:IncidentSource.WalkIn}" />
+                                <ComboBoxItem Content="مراقبة" Tag="{x:Static data:IncidentSource.Monitoring}" />
+                                <ComboBoxItem Content="أخرى" Tag="{x:Static data:IncidentSource.Other}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="160">
+                            <TextBlock Text="نوع المعدات" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.EquipmentType, Mode=TwoWay}" SelectedValuePath="Tag" Width="150">
+                                <ComboBoxItem Content="ونش ساحة" Tag="{x:Static data:EquipmentType.RTG}" />
+                                <ComboBoxItem Content="كالمر" Tag="{x:Static data:EquipmentType.Kalmar}" />
+                                <ComboBoxItem Content="هيستر" Tag="{x:Static data:EquipmentType.Hyster}" />
+                                <ComboBoxItem Content="رافع حاويات" Tag="{x:Static data:EquipmentType.ReachStacker}" />
+                                <ComboBoxItem Content="نقطة وصول" Tag="{x:Static data:EquipmentType.AccessPoint}" />
+                                <ComboBoxItem Content="جهاز كمبيوتر" Tag="{x:Static data:EquipmentType.PC}" />
+                                <ComboBoxItem Content="طابعة" Tag="{x:Static data:EquipmentType.Printer}" />
+                                <ComboBoxItem Content="كاميرات بوابات" Tag="{x:Static data:EquipmentType.GatesOcrCamera}" />
+                                <ComboBoxItem Content="جهاز لاسلكي" Tag="{x:Static data:EquipmentType.RDT}" />
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,15,8" Width="130">
+                            <TextBlock Text="الوردية" FontSize="11" Foreground="#FF888888" />
+                            <ComboBox SelectedValue="{Binding EditIncident.Shift, Mode=TwoWay}" SelectedValuePath="Tag" Width="120">
+                                <ComboBoxItem Content="أحمر" Tag="{x:Static data:Shift.Red}" />
+                                <ComboBoxItem Content="أصفر" Tag="{x:Static data:Shift.Yellow}" />
+                                <ComboBoxItem Content="أزرق" Tag="{x:Static data:Shift.Blue}" />
+                            </ComboBox>
+                        </StackPanel>
+                    </WrapPanel>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="0,8,0,0">
+                        <Button Content="إلغاء" Command="{Binding CancelEditCommand}" Padding="16,8" Margin="0,0,8,0" />
+                        <Button Content="حفظ" Command="{Binding SaveCommand}"
+                                Style="{StaticResource ActionButtonStyle}" Padding="16,8" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

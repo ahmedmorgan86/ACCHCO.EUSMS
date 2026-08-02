@@ -1,0 +1,73 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.ShiftHandoverView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ACCHCO.EUSMS.App.ViewModels"
+             xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+             xmlns:data="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+             FlowDirection="RightToLeft"
+             Loaded="OnLoaded">
+
+    <UserControl.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:InverseBooleanConverter x:Key="InverseBool" />
+        <helpers:NullToBoolConverter x:Key="NullToBool" />
+        <helpers:NullToVisibilityConverter x:Key="NullToVis" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="تسليم الورديات" Style="{StaticResource PageTitleStyle}" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
+            <Button Content="➕ تسليمة جديدة" Click="OnNewHandoverClick"
+                    Style="{StaticResource ActionButtonStyle}" />
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="8,0,0,0">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="تفاصيل التسليمة" Style="{StaticResource SectionHeaderStyle}" />
+                        <TextBlock Text="{Binding SelectedHandover.Summary}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <TextBlock Text="المهام المعلقة" FontWeight="SemiBold" Margin="0,0,0,3"
+                                   Visibility="{Binding SelectedHandover.PendingTasks, Converter={StaticResource NullToVis}}" />
+                        <TextBlock Text="{Binding SelectedHandover.PendingTasks}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <TextBlock Text="ملاحظات هامة" FontWeight="SemiBold" Margin="0,0,0,3" />
+                        <TextBlock Text="{Binding SelectedHandover.ImportantNotes}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <TextBlock Text="التصعيدات" FontWeight="SemiBold" Margin="0,0,0,3" />
+                        <TextBlock Text="{Binding SelectedHandover.EscalationItems}" TextWrapping="Wrap" Margin="0,0,0,10" />
+                        <Button Content="تأكيد الاستلام" Command="{Binding AcknowledgeHandoverCommand}"
+                                Padding="12,6" Margin="0,5,0,0"
+                                IsEnabled="{Binding SelectedHandover.IsAcknowledged, Converter={StaticResource InverseBool}}" />
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,8,0">
+                <StackPanel>
+                    <TextBlock Text="سجل التسليمات" Style="{StaticResource SectionHeaderStyle}" />
+                    <DataGrid ItemsSource="{Binding Handovers}" Style="{StaticResource DataGridStyle}"
+                              SelectedItem="{Binding SelectedHandover}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="التاريخ" Binding="{Binding HandoverDate, StringFormat=d}" Width="90" />
+                            <DataGridTextColumn Header="من وردية" Binding="{Binding FromShift}" Width="60" />
+                            <DataGridTextColumn Header="إلى وردية" Binding="{Binding ToShift}" Width="60" />
+                            <DataGridTextColumn Header="المختص" Binding="{Binding FromSpecialist.FullName}" Width="130" />
+                            <DataGridTextColumn Header="مقبول" Binding="{Binding IsAcknowledged}" Width="90" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+</Grid>
+</UserControl>

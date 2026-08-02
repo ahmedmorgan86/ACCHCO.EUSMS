@@ -1,0 +1,206 @@
+<Window x:Class="ACCHCO.EUSMS.App.Views.TicketDetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+        xmlns:data="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+        FlowDirection="RightToLeft"
+        Icon="/Assets/app.ico"
+        Title="{Binding WindowTitle}" Width="980" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanResize"
+        MaxHeight="820">
+
+    <Window.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:InverseBooleanConverter x:Key="InverseBool" />
+        <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button Content="حل" Command="{Binding ResolveTicketCommand}" Padding="12,6"
+                        Style="{StaticResource SecondaryButtonStyle}" Background="#FF16A34A" Foreground="White" Margin="0,0,6,0"
+                        Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}" />
+                <Button Content="إغلاق التذكرة" Command="{Binding CloseTicketCommand}" Padding="12,6"
+                        Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,6,0"
+                        Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}" />
+                <Button Content="تعديل" Command="{Binding ToggleEditCommand}" Padding="12,6"
+                        Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,6,0"
+                        Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}" />
+                <Button Content="حفظ" Command="{Binding SaveTicketCommand}" Padding="12,6"
+                        Style="{StaticResource ActionButtonStyle}" Margin="0,0,6,0"
+                        Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVis}}" />
+                <Button Content="إلغاء" Command="{Binding CloseDialogCommand}" Padding="12,6"
+                        Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,6,0" />
+            </StackPanel>
+            <TextBlock DockPanel.Dock="Right" Style="{StaticResource DialogTitleStyle}"
+                       Text="{Binding WindowTitle}" />
+        </DockPanel>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- معلومات التذكرة (مخفية عند إنشاء تذكرة جديدة) -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10"
+                        Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="معلومات التذكرة" Style="{StaticResource SectionHeaderStyle}" />
+
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,20,10" Width="160">
+                                <TextBlock Text="رقم التذكرة" FontSize="11" Foreground="#FF888888" />
+                                <TextBox Text="{Binding Ticket.TicketNumber}" FontWeight="SemiBold"
+                                         IsReadOnly="True" Padding="6,4" Width="140" />
+                                <TextBlock Text="(سيتم إنشاؤه تلقائياً)" FontSize="11" Foreground="#FF888888"
+                                           Visibility="{Binding IsNewTicket, Converter={StaticResource BoolToVis}}" />
+                                <TextBlock Text="{Binding GeneratedTicketNumber}" FontWeight="Bold"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           Visibility="{Binding IsNewTicket, Converter={StaticResource BoolToVis}}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="140">
+                                <TextBlock Text="التاريخ" FontSize="11" Foreground="#FF888888" />
+                                <DatePicker SelectedDate="{Binding Ticket.TicketDate}" Width="130"
+                                            IsEnabled="{Binding IsEditMode}" FontSize="12" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="110">
+                                <TextBlock Text="الوردية" FontSize="11" Foreground="#FF888888" />
+                                <ComboBox SelectedValue="{Binding Ticket.Shift, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag"
+                                          IsEnabled="{Binding IsEditMode}" Width="100" FontSize="12">
+                                    <ComboBoxItem Content="الحمراء" Tag="{x:Static data:Shift.Red}" />
+                                    <ComboBoxItem Content="الصفراء" Tag="{x:Static data:Shift.Yellow}" />
+                                    <ComboBoxItem Content="الزرقاء" Tag="{x:Static data:Shift.Blue}" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="130">
+                                <TextBlock Text="الحالة" FontSize="11" Foreground="#FF888888" />
+                                <ComboBox SelectedValue="{Binding Ticket.Status, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag"
+                                          IsEnabled="{Binding IsEditMode}" Width="120" FontSize="12">
+                                    <ComboBoxItem Content="مفتوحة" Tag="{x:Static data:TicketStatus.Open}" />
+                                    <ComboBoxItem Content="قيد التنفيذ" Tag="{x:Static data:TicketStatus.InProgress}" />
+                                    <ComboBoxItem Content="معلقة" Tag="{x:Static data:TicketStatus.OnHold}" />
+                                    <ComboBoxItem Content="محلولة" Tag="{x:Static data:TicketStatus.Resolved}" />
+                                    <ComboBoxItem Content="مغلقة" Tag="{x:Static data:TicketStatus.Closed}" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="110">
+                                <TextBlock Text="الأولوية" FontSize="11" Foreground="#FF888888" />
+                                <ComboBox SelectedValue="{Binding Ticket.Priority, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Tag"
+                                          IsEnabled="{Binding IsEditMode}" Width="100" FontSize="12">
+                                    <ComboBoxItem Content="منخفضة" Tag="{x:Static data:Priority.Low}" />
+                                    <ComboBoxItem Content="متوسطة" Tag="{x:Static data:Priority.Medium}" />
+                                    <ComboBoxItem Content="عالية" Tag="{x:Static data:Priority.High}" />
+                                    <ComboBoxItem Content="حرجة" Tag="{x:Static data:Priority.Critical}" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="160">
+                                <TextBlock Text="المتخصص المسؤول" FontSize="11" Foreground="#FF888888" />
+                                <ComboBox ItemsSource="{Binding Specialists}" Width="150" FontSize="12"
+                                          SelectedValue="{Binding Ticket.SupportSpecialistId}"
+                                          SelectedValuePath="Id" DisplayMemberPath="FullName"
+                                          IsEnabled="{Binding IsEditMode}" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="120">
+                                <TextBlock Text="عاجلة" FontSize="11" Foreground="#FF888888" />
+                                <CheckBox IsChecked="{Binding Ticket.IsUrgent}" IsEnabled="{Binding IsEditMode}"
+                                          FontSize="12" Content="نعم / لا" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- بيانات مقدم الطلب -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="اسم مقدم الطلب" Style="{StaticResource SectionHeaderStyle}" />
+                        <TextBlock Text="يتم تعبئة الاسم تلقائياً من بيانات المستخدم الحالي" FontSize="11" Foreground="#FF888888" Margin="0,0,0,8" />
+                        <StackPanel Margin="0,0,0,10" Width="420" HorizontalAlignment="Right">
+                            <TextBlock Text="الاسم الكامل" FontSize="11" Foreground="#FF888888" />
+                            <TextBox Text="{Binding Ticket.RequesterName, UpdateSourceTrigger=PropertyChanged}"
+                                     IsReadOnly="True" Padding="6,4" Width="400" Background="#FFF9F9F9" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- معلومات المعدة -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="معلومات المعدة" Style="{StaticResource SectionHeaderStyle}" />
+                        <WrapPanel>
+                            <StackPanel Margin="0,0,20,10" Width="180">
+                                <TextBlock Text="نوع المعدة" FontSize="11" Foreground="#FF888888" />
+                                <ComboBox SelectedValue="{Binding Ticket.EquipmentType}" SelectedValuePath="Tag"
+                                          IsEnabled="{Binding IsEditMode}" Width="170" FontSize="12">
+                                    <ComboBoxItem Content="ونش ساحة (RTG)" Tag="{x:Static data:EquipmentType.RTG}" />
+                                    <ComboBoxItem Content="معدة كالمر (Calmr)" Tag="{x:Static data:EquipmentType.Kalmar}" />
+                                    <ComboBoxItem Content="معدة هيستر (Hastr)" Tag="{x:Static data:EquipmentType.Hyster}" />
+                                    <ComboBoxItem Content="رافع حاويات (RS)" Tag="{x:Static data:EquipmentType.ReachStacker}" />
+                                    <ComboBoxItem Content="نقطة وصول (AP)" Tag="{x:Static data:EquipmentType.AccessPoint}" />
+                                    <ComboBoxItem Content="جهاز كمبيوتر (PC)" Tag="{x:Static data:EquipmentType.PC}" />
+                                    <ComboBoxItem Content="طابعة" Tag="{x:Static data:EquipmentType.Printer}" />
+                                    <ComboBoxItem Content="كاميرات البوابات" Tag="{x:Static data:EquipmentType.GatesOcrCamera}" />
+                                    <ComboBoxItem Content="جهاز لاسلكي (RDT)" Tag="{x:Static data:EquipmentType.RDT}" />
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="240">
+                                <TextBlock Text="اسم المعدة" FontSize="11" Foreground="#FF888888" />
+                                <TextBox Text="{Binding Ticket.EquipmentName, UpdateSourceTrigger=PropertyChanged}"
+                                         IsEnabled="{Binding IsEditMode}" Padding="6,4" Width="230" />
+                            </StackPanel>
+                            <StackPanel Margin="0,0,20,10" Width="150">
+                                <TextBlock Text="عنوان IP" FontSize="11" Foreground="#FF888888" />
+                                <TextBox Text="{Binding Ticket.IpAddress, UpdateSourceTrigger=PropertyChanged}"
+                                         IsEnabled="{Binding IsEditMode}" Padding="6,4" Width="140" />
+                            </StackPanel>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- تفاصيل المشكلة -->
+                <Border Style="{StaticResource CardStyle}" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="تفاصيل المشكلة" Style="{StaticResource SectionHeaderStyle}" />
+                        <TextBlock Text="وصف المشكلة *" FontSize="11" Foreground="#FF888888" Margin="0,0,0,3" />
+                        <TextBox Text="{Binding Ticket.ProblemDescription, UpdateSourceTrigger=PropertyChanged}"
+                                 IsEnabled="{Binding IsEditMode}" TextWrapping="Wrap"
+                                 AcceptsReturn="True" Height="100" Margin="0,0,0,10" Padding="6,4" />
+                        <StackPanel Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}">
+                            <TextBlock Text="الإجراءات المتخذة" FontSize="11" Foreground="#FF888888" Margin="0,0,0,3" />
+                            <TextBox Text="{Binding Ticket.ActionsTaken, UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsEditMode}" TextWrapping="Wrap"
+                                     AcceptsReturn="True" Height="80" Margin="0,0,0,10" Padding="6,4" />
+                            <TextBlock Text="الحل النهائي" FontSize="11" Foreground="#FF888888" Margin="0,0,0,3" />
+                            <TextBox Text="{Binding Ticket.Solution, UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsEditMode}" TextWrapping="Wrap"
+                                     AcceptsReturn="True" Height="80" Margin="0,0,0,10" Padding="6,4" />
+                            <TextBlock Text="ملاحظات" FontSize="11" Foreground="#FF888888" Margin="0,0,0,3" />
+                            <TextBox Text="{Binding Ticket.Notes, UpdateSourceTrigger=PropertyChanged}"
+                                     IsEnabled="{Binding IsEditMode}" TextWrapping="Wrap"
+                                     AcceptsReturn="True" Height="60" Padding="6,4" />
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- حل سريع -->
+                <Border Style="{StaticResource CardStyle}"
+                        Visibility="{Binding IsNewTicket, Converter={StaticResource InverseBoolToVis}}">
+                    <StackPanel>
+                        <TextBlock Text="حل سريع" Style="{StaticResource SectionHeaderStyle}" />
+                        <DockPanel>
+                            <Button Content="حل التذكرة" Command="{Binding ResolveTicketCommand}"
+                                    Style="{StaticResource ActionButtonStyle}" DockPanel.Dock="Right"
+                                    Margin="10,0,0,0" Padding="12,6" />
+                            <TextBox Text="{Binding NewSolution, UpdateSourceTrigger=PropertyChanged}"
+                                     Padding="6,4" FontSize="12" Tag="أدخل وصف الحل هنا..." />
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>

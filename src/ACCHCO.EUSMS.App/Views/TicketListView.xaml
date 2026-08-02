@@ -1,0 +1,191 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.TicketListView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ACCHCO.EUSMS.App.ViewModels"
+             xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+             xmlns:data="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+             FlowDirection="RightToLeft"
+             Loaded="OnLoaded">
+
+    <UserControl.Resources>
+        <helpers:EnumToArabicConverter x:Key="EnumToArabic" />
+        <helpers:StatusToColorConverter x:Key="StatusColorConv" />
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:NullToBoolConverter x:Key="NullToBool" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="إدارة التذاكر" Style="{StaticResource PageTitleStyle}" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
+            <Button Content="➕ تذكرة جديدة" Command="{Binding CreateNewTicketCommand}" Style="{StaticResource ActionButtonStyle}" Margin="0,0,10,0" />
+            <Button Content="🗑️ حذف التذكرة" Command="{Binding DeleteTicketCommand}" Style="{StaticResource SecondaryButtonStyle}" Foreground="#FFDC2626" IsEnabled="{Binding SelectedTicket, Converter={StaticResource NullToBool}}" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Margin="0,0,0,10" Padding="12">
+            <WrapPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="من" FontSize="11" Foreground="#FF888888" />
+                    <DatePicker SelectedDate="{Binding FilterDateFrom}" Width="140" FontSize="12" />
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="إلى" FontSize="11" Foreground="#FF888888" />
+                    <DatePicker SelectedDate="{Binding FilterDateTo}" Width="140" FontSize="12" />
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الوردية" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="110" SelectedValue="{Binding FilterShift}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="الحمراء" Tag="{x:Static data:Shift.Red}" />
+                        <ComboBoxItem Content="الصفراء" Tag="{x:Static data:Shift.Yellow}" />
+                        <ComboBoxItem Content="الزرقاء" Tag="{x:Static data:Shift.Blue}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الحالة" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="120" SelectedValue="{Binding FilterStatus}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="مفتوحة" Tag="{x:Static data:TicketStatus.Open}" />
+                        <ComboBoxItem Content="قيد التنفيذ" Tag="{x:Static data:TicketStatus.InProgress}" />
+                        <ComboBoxItem Content="معلقة" Tag="{x:Static data:TicketStatus.OnHold}" />
+                        <ComboBoxItem Content="محلولة" Tag="{x:Static data:TicketStatus.Resolved}" />
+                        <ComboBoxItem Content="مغلقة" Tag="{x:Static data:TicketStatus.Closed}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الأولوية" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="110" SelectedValue="{Binding FilterPriority}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="منخفضة" Tag="{x:Static data:Priority.Low}" />
+                        <ComboBoxItem Content="متوسطة" Tag="{x:Static data:Priority.Medium}" />
+                        <ComboBoxItem Content="عالية" Tag="{x:Static data:Priority.High}" />
+                        <ComboBoxItem Content="حرجة" Tag="{x:Static data:Priority.Critical}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="المتخصص" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="140" ItemsSource="{Binding FilterSpecialists}"
+                              SelectedValue="{Binding FilterSpecialistId}" SelectedValuePath="Id"
+                              DisplayMemberPath="FullName" FontSize="12" />
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="نوع المعدة" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="140" SelectedValue="{Binding FilterEquipmentType}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="ونش ساحة (RTG)" Tag="{x:Static data:EquipmentType.RTG}" />
+                        <ComboBoxItem Content="معدة كالمر (Calmr)" Tag="{x:Static data:EquipmentType.Kalmar}" />
+                        <ComboBoxItem Content="معدة هيستر (Hastr)" Tag="{x:Static data:EquipmentType.Hyster}" />
+                        <ComboBoxItem Content="رافع حاويات (RS)" Tag="{x:Static data:EquipmentType.ReachStacker}" />
+                        <ComboBoxItem Content="نقطة وصول (AP)" Tag="{x:Static data:EquipmentType.AccessPoint}" />
+                        <ComboBoxItem Content="جهاز كمبيوتر (PC)" Tag="{x:Static data:EquipmentType.PC}" />
+                        <ComboBoxItem Content="طابعة (Printers)" Tag="{x:Static data:EquipmentType.Printer}" />
+                        <ComboBoxItem Content="كاميرات البوابات" Tag="{x:Static data:EquipmentType.GatesOcrCamera}" />
+                        <ComboBoxItem Content="جهاز لاسلكي (RDT)" Tag="{x:Static data:EquipmentType.RDT}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="نوع العطل" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="130" SelectedValue="{Binding FilterFaultType}" SelectedValuePath="Tag" FontSize="12">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="عتاد" Tag="{x:Static data:FaultType.Hardware}" />
+                        <ComboBoxItem Content="برنامج" Tag="{x:Static data:FaultType.Software}" />
+                        <ComboBoxItem Content="شبكة" Tag="{x:Static data:FaultType.Network}" />
+                        <ComboBoxItem Content="اتصال" Tag="{x:Static data:FaultType.Connectivity}" />
+                        <ComboBoxItem Content="أداء" Tag="{x:Static data:FaultType.Performance}" />
+                        <ComboBoxItem Content="أمن" Tag="{x:Static data:FaultType.Security}" />
+                        <ComboBoxItem Content="إعدادات" Tag="{x:Static data:FaultType.Configuration}" />
+                        <ComboBoxItem Content="خطأ مستخدم" Tag="{x:Static data:FaultType.UserError}" />
+                        <ComboBoxItem Content="أخرى" Tag="{x:Static data:FaultType.Other}" />
+                    </ComboBox>
+                </StackPanel>
+                <Button Content="تطبيق" Command="{Binding ApplyFiltersCommand}"
+                        Style="{StaticResource ActionButtonStyle}"
+                        VerticalAlignment="Bottom" Margin="0,0,5,0" Padding="12,8" />
+                <Button Content="مسح" Command="{Binding ClearFiltersCommand}"
+                        VerticalAlignment="Bottom" Padding="12,8" />
+            </WrapPanel>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,0,0,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                    <TextBlock Foreground="#FF888888" FontSize="12" VerticalAlignment="Center">
+                        <Run Text="الإجمالي: " /><Run Text="{Binding TotalCount, Mode=OneWay}" FontWeight="SemiBold" />
+                        <Run Text="  |  مفتوحة: " /><Run Text="{Binding OpenCount, Mode=OneWay}" FontWeight="SemiBold" Foreground="#FFFF9800" />
+                        <Run Text="  |  مغلقة: " /><Run Text="{Binding ClosedCount, Mode=OneWay}" FontWeight="SemiBold" Foreground="#FF4CAF50" />
+                    </TextBlock>
+                </StackPanel>
+                <TextBox DockPanel.Dock="Right" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Width="280" Padding="8,5" FontSize="12" HorizontalAlignment="Right"
+                         ToolTip="بحث في رقم التذكرة، مقدم الطلب، اسم الجهاز" />
+            </DockPanel>
+        </Grid>
+
+        <DataGrid Grid.Row="3" ItemsSource="{Binding Tickets}" Style="{StaticResource DataGridStyle}"
+                  SelectedItem="{Binding SelectedTicket}"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick">
+            <DataGrid.ContextMenu>
+                <ContextMenu FlowDirection="RightToLeft">
+                    <MenuItem Header="📄 عرض التفاصيل وتعديل التذكرة" Click="OnContextMenuOpen" />
+                    <MenuItem Header="➕ إنشاء تذكرة جديدة" Command="{Binding CreateNewTicketCommand}" />
+                    <Separator />
+                    <MenuItem Header="🗑️ حذف التذكرة" Command="{Binding DeleteTicketCommand}" Foreground="#FFDC2626" />
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="رقم التذكرة" Binding="{Binding TicketNumber}" Width="140" />
+                <DataGridTextColumn Header="التاريخ" Binding="{Binding TicketDate, StringFormat='{}{0:dd/MM/yyyy HH:mm}'}" Width="130" />
+                <DataGridTemplateColumn Header="الوردية" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Shift, Converter={StaticResource EnumToArabic}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="المتخصص" Binding="{Binding SupportSpecialist.FullName}" Width="140" />
+                <DataGridTextColumn Header="مقدم الطلب" Binding="{Binding RequesterName}" Width="150" />
+                <DataGridTextColumn Header="القسم" Binding="{Binding RequesterSection}" Width="120" />
+                <DataGridTemplateColumn Header="نوع المعدة" Width="150">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding EquipmentType, Converter={StaticResource EnumToArabic}}" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="اسم المعدة" Binding="{Binding EquipmentName}" Width="120" />
+                <DataGridTemplateColumn Header="الأولوية" Width="100">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Priority, Converter={StaticResource EnumToArabic}}"
+                                       Foreground="{Binding Priority, Converter={StaticResource StatusColorConv}}"
+                                       FontWeight="SemiBold" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="الحالة" Width="110">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Status, Converter={StaticResource EnumToArabic}}"
+                                       Foreground="{Binding Status, Converter={StaticResource StatusColorConv}}"
+                                       FontWeight="SemiBold" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTextColumn Header="المشكلة" Binding="{Binding ProblemDescription}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <Border Grid.Row="3" Background="#80FFFFFF"
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="جاري التحميل..." FontSize="16" HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

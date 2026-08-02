@@ -1,0 +1,111 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.ReportsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ACCHCO.EUSMS.App.ViewModels"
+             xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+             xmlns:data="clr-namespace:ACCHCO.EUSMS.Data.Entities;assembly=ACCHCO.EUSMS.Data"
+             FlowDirection="RightToLeft"
+             Loaded="OnLoaded">
+
+    <UserControl.Resources>
+        <helpers:BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <helpers:EnumToArabicConverter x:Key="EnumToArabic" />
+    </UserControl.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="تقارير دعم المستخدم النهائي" Style="{StaticResource PageTitleStyle}" />
+
+        <Border Grid.Row="1" Style="{StaticResource CardStyle}" Padding="12">
+            <WrapPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="من تاريخ" FontSize="11" Foreground="#FF888888" />
+                    <DatePicker SelectedDate="{Binding ReportDateFrom}" Width="130" />
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="إلى تاريخ" FontSize="11" Foreground="#FF888888" />
+                    <DatePicker SelectedDate="{Binding ReportDateTo}" Width="130" />
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الوردية" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="100" SelectedValue="{Binding ReportShift}" SelectedValuePath="Tag">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="الحمراء" Tag="{x:Static data:Shift.Red}" />
+                        <ComboBoxItem Content="الصفراء" Tag="{x:Static data:Shift.Yellow}" />
+                        <ComboBoxItem Content="الزرقاء" Tag="{x:Static data:Shift.Blue}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="نوع المعدة / الجهاز" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="160" SelectedValue="{Binding ReportEquipmentType}" SelectedValuePath="Tag">
+                        <ComboBoxItem Content="جميع المعدات" Tag="{x:Null}" />
+                        <ComboBoxItem Content="ونش ساحة (RTG)" Tag="{x:Static data:EquipmentType.RTG}" />
+                        <ComboBoxItem Content="معدة كالمر (Calmr)" Tag="{x:Static data:EquipmentType.Kalmar}" />
+                        <ComboBoxItem Content="معدة هيستر (Hastr)" Tag="{x:Static data:EquipmentType.Hyster}" />
+                        <ComboBoxItem Content="رافع حاويات (RS)" Tag="{x:Static data:EquipmentType.ReachStacker}" />
+                        <ComboBoxItem Content="نقطة وصول" Tag="{x:Static data:EquipmentType.AccessPoint}" />
+                        <ComboBoxItem Content="جهاز كمبيوتر" Tag="{x:Static data:EquipmentType.PC}" />
+                        <ComboBoxItem Content="طابعة" Tag="{x:Static data:EquipmentType.Printer}" />
+                        <ComboBoxItem Content="كاميرات البوابات" Tag="{x:Static data:EquipmentType.GatesOcrCamera}" />
+                        <ComboBoxItem Content="جهاز لاسلكي" Tag="{x:Static data:EquipmentType.RDT}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الحالة" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="110" SelectedValue="{Binding ReportStatus}" SelectedValuePath="Tag">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="مفتوحة" Tag="{x:Static data:TicketStatus.Open}" />
+                        <ComboBoxItem Content="قيد التنفيذ" Tag="{x:Static data:TicketStatus.InProgress}" />
+                        <ComboBoxItem Content="موقوفة" Tag="{x:Static data:TicketStatus.OnHold}" />
+                        <ComboBoxItem Content="محلولة" Tag="{x:Static data:TicketStatus.Resolved}" />
+                        <ComboBoxItem Content="مغلقة" Tag="{x:Static data:TicketStatus.Closed}" />
+                    </ComboBox>
+                </StackPanel>
+                <StackPanel Margin="0,0,15,5">
+                    <TextBlock Text="الأولوية" FontSize="11" Foreground="#FF888888" />
+                    <ComboBox Width="100" SelectedValue="{Binding ReportPriority}" SelectedValuePath="Tag">
+                        <ComboBoxItem Content="الكل" Tag="{x:Null}" />
+                        <ComboBoxItem Content="منخفضة" Tag="{x:Static data:Priority.Low}" />
+                        <ComboBoxItem Content="متوسطة" Tag="{x:Static data:Priority.Medium}" />
+                        <ComboBoxItem Content="عالية" Tag="{x:Static data:Priority.High}" />
+                        <ComboBoxItem Content="حرجة" Tag="{x:Static data:Priority.Critical}" />
+                    </ComboBox>
+                </StackPanel>
+                <Button Content="عرض التقرير" Command="{Binding GenerateReportCommand}"
+                        Style="{StaticResource ActionButtonStyle}" VerticalAlignment="Bottom"
+                        Margin="0,0,8,5" Padding="14,8" />
+                <Button Content="تصدير PDF" Command="{Binding ExportToPdfCommand}"
+                        VerticalAlignment="Bottom" Margin="0,0,5,5" Padding="10,8" />
+                <Button Content="تصدير Excel" Command="{Binding ExportToExcelCommand}"
+                        VerticalAlignment="Bottom" Margin="0,0,5,5" Padding="10,8" />
+                <Button Content="تصدير CSV" Command="{Binding ExportToCsvCommand}"
+                        VerticalAlignment="Bottom" Margin="0,0,5,5" Padding="10,8" />
+            </WrapPanel>
+        </Border>
+
+        <TextBlock Grid.Row="2" Text="{Binding ReportTitle}" FontSize="14" FontWeight="SemiBold"
+                   Foreground="{StaticResource PrimaryBrush}" Margin="0,10,0,5" />
+
+        <DataGrid Grid.Row="3" ItemsSource="{Binding ReportTickets}" Style="{StaticResource DataGridStyle}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="رقم التذكرة" Binding="{Binding TicketNumber}" Width="120" />
+                <DataGridTextColumn Header="التاريخ" Binding="{Binding TicketDate, StringFormat=dd/MM/yyyy}" Width="90" />
+                <DataGridTextColumn Header="الوردية" Binding="{Binding Shift, Converter={StaticResource EnumToArabic}}" Width="80" />
+                <DataGridTextColumn Header="المتخصص" Binding="{Binding SupportSpecialist.FullName}" Width="120" />
+                <DataGridTextColumn Header="مقدم الطلب" Binding="{Binding RequesterName}" Width="120" />
+                <DataGridTextColumn Header="نوع المعدة" Binding="{Binding EquipmentType, Converter={StaticResource EnumToArabic}}" Width="140" />
+                <DataGridTextColumn Header="نوع العطل" Binding="{Binding FaultType, Converter={StaticResource EnumToArabic}}" Width="120" />
+                <DataGridTextColumn Header="الأولوية" Binding="{Binding Priority, Converter={StaticResource EnumToArabic}}" Width="80" />
+                <DataGridTextColumn Header="الحالة" Binding="{Binding Status, Converter={StaticResource EnumToArabic}}" Width="90" />
+                <DataGridTextColumn Header="وقت الحل (دقيقة)" Binding="{Binding ResolutionTimeMinutes, StringFormat='{}{0:F0}'}" Width="100" />
+                <DataGridTextColumn Header="المشكلة" Binding="{Binding ProblemDescription}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</UserControl>

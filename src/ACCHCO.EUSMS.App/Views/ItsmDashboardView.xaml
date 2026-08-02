@@ -1,0 +1,110 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.ItsmDashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             FlowDirection="RightToLeft">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+    </UserControl.Resources>
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="16">
+        <StackPanel>
+            <TextBlock Text="لوحة تحكم ITSM" Style="{StaticResource PageTitleStyle}" />
+
+            <WrapPanel Margin="0,0,0,12">
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="حوادث مفتوحة" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalOpenIncidents}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="تغييرات مفتوحة" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalOpenChanges}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="مشاكل مفتوحة" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalOpenProblems}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="متوسط وقت الحل (دقيقة)" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding Mttr}" FontSize="28" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="حوادث حرجة" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalCriticalIncidents}" FontSize="28" FontWeight="Bold" Foreground="Red" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource KpiCardStyle}" Width="200" Margin="6">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="حوادث متصاعدة" FontSize="12" Foreground="#FF666666" HorizontalAlignment="Center" />
+                        <TextBlock Text="{Binding TotalEscalatedIncidents}" FontSize="28" FontWeight="Bold" Foreground="Orange" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="اتجاه الحوادث (آخر 30 يوم)" Style="{StaticResource SectionHeaderStyle}" />
+                    <ItemsControl ItemsSource="{Binding IncidentTrendData}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="6,4" Margin="0,2" Background="#FFF8F9FA" CornerRadius="4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Date}" Width="120" FontSize="12" />
+                                        <TextBlock Text="{Binding Count}" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Grid Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" /><ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,6,0">
+                    <StackPanel>
+                        <TextBlock Text="أكثر الأعطال تكراراً" Style="{StaticResource SectionHeaderStyle}" />
+                        <ItemsControl ItemsSource="{Binding TopEquipmentData}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="6,4" Margin="0,2" Background="#FFF8F9FA" CornerRadius="4">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding EquipmentType}" Width="120" FontSize="12" />
+                                            <TextBlock Text="{Binding Count}" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="6,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="أكثر الإدارات طلباً" Style="{StaticResource SectionHeaderStyle}" />
+                        <ItemsControl ItemsSource="{Binding TopDepartmentsData}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Padding="6,4" Margin="0,2" Background="#FFF8F9FA" CornerRadius="4">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Department}" Width="120" FontSize="12" />
+                                            <TextBlock Text="{Binding Count}" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

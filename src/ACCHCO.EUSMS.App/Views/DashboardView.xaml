@@ -1,0 +1,150 @@
+<UserControl x:Class="ACCHCO.EUSMS.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:ACCHCO.EUSMS.App.ViewModels"
+             xmlns:helpers="clr-namespace:ACCHCO.EUSMS.App.Helpers"
+             FlowDirection="RightToLeft"
+             Loaded="OnLoaded">
+
+    <UserControl.Resources>
+        <helpers:StatusToColorConverter x:Key="StatusColorConverter" />
+        <helpers:EnumToArabicConverter x:Key="EnumToArabic" />
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="24">
+        <StackPanel>
+            <TextBlock Text="لوحة التحكم الرئيسية" Style="{StaticResource PageTitleStyle}" />
+            
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
+                <Button Content="➕ إنشاء تذكرة جديدة" Command="{Binding CreateTicketCommand}"
+                        Style="{StaticResource ActionButtonStyle}" />
+            </StackPanel>
+
+            <!-- بطاقات الأداء -->
+            <WrapPanel Margin="0,0,0,15">
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="تذاكر اليوم" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock Text="{Binding TodayTicketCount}" FontSize="32" FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryBrush}" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="تذاكر مفتوحة" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock Text="{Binding OpenTicketCount}" FontSize="32" FontWeight="Bold"
+                                   Foreground="#FFFF9800" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="تذاكر مغلقة" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock Text="{Binding ClosedTicketCount}" FontSize="32" FontWeight="Bold"
+                                   Foreground="#FF4CAF50" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="متوسط وقت الحل (دقيقة)" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock FontSize="32" FontWeight="Bold" Foreground="#FF2196F3" Margin="0,5,0,0">
+                            <TextBlock.Text>
+                                <Binding Path="AverageResolutionMinutes" StringFormat="{}{0:F0}" />
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="نسبة الحل" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock FontSize="32" FontWeight="Bold" Foreground="#FF4CAF50" Margin="0,5,0,0">
+                            <TextBlock.Text>
+                                <Binding Path="ResolutionRate" StringFormat="{}{0:F0}%" />
+                            </TextBlock.Text>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="تذاكر حرجة مفتوحة" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock Text="{Binding CriticalOpenTickets}" FontSize="32" FontWeight="Bold"
+                                   Foreground="#FFF44336" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Border>
+
+                <Border Style="{StaticResource KpiCardStyle}">
+                    <StackPanel Width="160">
+                        <TextBlock Text="المعدات" FontSize="11" Foreground="#FF888888" />
+                        <TextBlock Text="{Binding TotalEquipment}" FontSize="32" FontWeight="Bold"
+                                   Foreground="{StaticResource PrimaryBrush}" Margin="0,5,0,0" />
+                    </StackPanel>
+                </Border>
+            </WrapPanel>
+
+            <!-- التذاكر الأخيرة -->
+            <Border Style="{StaticResource CardStyle}" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="التذاكر الأخيرة" Style="{StaticResource SectionHeaderStyle}" />
+                    <DataGrid ItemsSource="{Binding RecentTickets}" Style="{StaticResource DataGridStyle}"
+                              MaxHeight="300">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="رقم التذكرة" Binding="{Binding TicketNumber}" Width="130" />
+                            <DataGridTextColumn Header="التاريخ" Binding="{Binding TicketDate, StringFormat=d}" Width="100" />
+                            <DataGridTemplateColumn Header="الوردية" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Shift, Converter={StaticResource EnumToArabic}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="مقدم الطلب" Binding="{Binding RequesterName}" Width="140" />
+                            <DataGridTemplateColumn Header="نوع المعدة" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding EquipmentType, Converter={StaticResource EnumToArabic}}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="الأولوية" Width="90">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Priority, Converter={StaticResource EnumToArabic}}" FontWeight="SemiBold" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTemplateColumn Header="الحالة" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Status, Converter={StaticResource EnumToArabic}}" FontWeight="Bold" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="وصف المشكلة" Binding="{Binding ProblemDescription}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- تسليم الورديات الأخيرة -->
+            <Border Style="{StaticResource CardStyle}">
+                <StackPanel>
+                    <TextBlock Text="تسليم الورديات الأخيرة" Style="{StaticResource SectionHeaderStyle}" />
+                    <DataGrid ItemsSource="{Binding RecentHandovers}" Style="{StaticResource DataGridStyle}"
+                              MaxHeight="250">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="التاريخ" Binding="{Binding HandoverDate, StringFormat=d}" Width="110" />
+                            <DataGridTextColumn Header="من وردية" Binding="{Binding FromShift}" Width="100" />
+                            <DataGridTextColumn Header="إلى وردية" Binding="{Binding ToShift}" Width="100" />
+                            <DataGridTextColumn Header="الملخص" Binding="{Binding Summary}" Width="*" />
+                            <DataGridTextColumn Header="المسؤول" Binding="{Binding CreatedBy}" Width="120" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
